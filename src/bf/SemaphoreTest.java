@@ -1,6 +1,7 @@
 package bf;
 
 import java.time.Instant;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -34,24 +35,45 @@ public class SemaphoreTest {
 //        exec.shutdown();
 
         // 固定线程的定时线程池
-        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(3);
-        scheduledExecutorService.scheduleAtFixedRate(() -> {
+//        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(3);
+//        scheduledExecutorService.scheduleAtFixedRate(() -> {
+//            System.out.println("scheduledExecutorService    = " + Instant.now().getEpochSecond() + Thread.currentThread().getName());
+//            try {
+//                Thread.sleep(3000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }, 2, 2, TimeUnit.SECONDS);
+//        scheduledExecutorService.scheduleAtFixedRate(() -> {
+//            System.out.println("scheduledExecutorService = " + Instant.now().getEpochSecond() + Thread.currentThread().getName());
+//        }, 2, 2, TimeUnit.SECONDS);
+//        scheduledExecutorService.scheduleAtFixedRate(() -> {
+//            System.out.println("scheduledExecutorService = " + Instant.now().getEpochSecond() + Thread.currentThread().getName());
+//        }, 2, 2, TimeUnit.SECONDS);
+//        scheduledExecutorService.scheduleAtFixedRate(() -> {
+//            System.out.println("scheduledExecutorService = " + Instant.now().getEpochSecond() + Thread.currentThread().getName());
+//        }, 2, 2, TimeUnit.SECONDS);
+
+
+        // 固定线程的定时线程池
+        ScheduledExecutorService test = Executors.newScheduledThreadPool(1);
+        CountDownLatch countDownLatch = new CountDownLatch(8);
+        test.scheduleAtFixedRate(() -> {
+            System.out.println("i = " + countDownLatch.getCount());
+//            try {
+//                Thread.sleep(3000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
             System.out.println("scheduledExecutorService    = " + Instant.now().getEpochSecond() + Thread.currentThread().getName());
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }, 2, 2, TimeUnit.SECONDS);
-        scheduledExecutorService.scheduleAtFixedRate(() -> {
-            System.out.println("scheduledExecutorService = " + Instant.now().getEpochSecond() + Thread.currentThread().getName());
-        }, 2, 2, TimeUnit.SECONDS);
-        scheduledExecutorService.scheduleAtFixedRate(() -> {
-            System.out.println("scheduledExecutorService = " + Instant.now().getEpochSecond() + Thread.currentThread().getName());
-        }, 2, 2, TimeUnit.SECONDS);
-        scheduledExecutorService.scheduleAtFixedRate(() -> {
-            System.out.println("scheduledExecutorService = " + Instant.now().getEpochSecond() + Thread.currentThread().getName());
-        }, 2, 2, TimeUnit.SECONDS);
+            countDownLatch.countDown();
+        }, 2, 1, TimeUnit.SECONDS);
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        test.shutdown();
     }
 
 }
